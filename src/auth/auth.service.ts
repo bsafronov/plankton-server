@@ -6,6 +6,7 @@ import { PrismaService } from 'src/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { SignInDTO } from './dto/sign-in.dto';
 import { SignUpDTO } from './dto/sign-up.dto';
+import { RefreshTokenDTO } from './dto/refresh-token.dto';
 
 @Injectable()
 export class AuthService {
@@ -35,7 +36,7 @@ export class AuthService {
       },
     });
 
-    return await this.generateTokens(newUser);
+    return await this.generateTokens(newUser.id);
   }
 
   async signIn(dto: SignInDTO) {
@@ -62,12 +63,27 @@ export class AuthService {
       throw new Error('Invalid credentials');
     }
 
-    return await this.generateTokens(user);
+    return await this.generateTokens(user.id);
   }
 
-  async generateTokens(user: User) {
+  async refreshToken(dto: RefreshTokenDTO) {
+    try {
+      const { sub: userId } = await this.jwtService.verifyAsync(
+        dto.refreshToken,
+        {
+          secret: process.env.JWT_REFRESH_SECRET_KEY,
+        },
+      );
+
+      return this.generateTokens(userId);
+    } catch (e) {
+      throw new HttpException('Invalid token', 401);
+    }
+  }
+
+  async generateTokens(userId: number) {
     const payload = {
-      sub: user.id,
+      sub: userId,
     };
 
     const tokens = {

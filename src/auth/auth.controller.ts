@@ -3,6 +3,7 @@ import { Public } from './auth.guard';
 import { AuthService } from './auth.service';
 import { SignInDTO } from './dto/sign-in.dto';
 import { SignUpDTO } from './dto/sign-up.dto';
+import { RefreshTokenDTO } from './dto/refresh-token.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -21,5 +22,7 @@ export class AuthController {
   }
 
   @Post('/token/refresh')
-  refreshToken() {}
+  refreshToken(@Body() dto: RefreshTokenDTO) {
+    return this.authService.refreshToken(dto);
+  }
 }
