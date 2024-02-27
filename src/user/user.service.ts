@@ -5,6 +5,10 @@ import { PrismaService } from 'src/prisma.service';
 export class UserService {
   constructor(private prismaService: PrismaService) {}
 
+  async findMany() {
+    return await this.prismaService.user.findMany();
+  }
+
   async findById(id: number) {
     return await this.prismaService.user.findUnique({
       where: {
