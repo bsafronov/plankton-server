@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -9,8 +10,11 @@ import { JwtModule } from '@nestjs/jwt';
     UserModule,
     JwtModule.register({
       global: true,
-      secret: 'TEST_SECRET',
+      secret: process.env.JWT_ACCESS_SECRET_KEY,
       signOptions: { expiresIn: '60s' },
+    }),
+    ConfigModule.forRoot({
+      isGlobal: true,
     }),
   ],
 })
