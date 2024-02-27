@@ -1,0 +1,153 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ProcessPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum ProcessStageStatus {
+  IN_PROGRESS
+  REJECTED
+  COMPLETED
+  PENDING
+}
+
+enum FormFieldType {
+  TEXT
+  TEXTAREA
+  NUMBER
+  SELECT
+  FILE
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int     @id @default(autoincrement())
+  email     String  @unique
+  username  String  @unique
+  password  String
+  firstName String?
+  lastName  String?
+  role      Role    @default(USER)
+
+  department   Department @relation(fields: [departmentId], references: [id])
+  departmentId Int
+
+  processStages   ProcessStage[]
+  processComments ProcessComment[]
+}
+
+model Department {
+  id    Int    @id @default(autoincrement())
+  name  String
+  users User[]
+
+  processStages ProcessTemplateStage[]
+}
+
+model Product {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  processes Process[]
+}
+
+model Process {
+  id       Int             @id @default(autoincrement())
+  priority ProcessPriority
+
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+
+  template   ProcessTemplate @relation(fields: [templateId], references: [id])
+  templateId Int
+
+  processStages     ProcessStage[]
+  processActivities ProcessActivity[]
+  processComments   ProcessComment[]
+}
+
+model ProcessTemplate {
+  id        Int       @id @default(autoincrement())
+  stages    Json
+  processes Process[]
+}
+
+model ProcessTemplateStage {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  responsibleDepartment   Department @relation(fields: [responsibleDepartmentId], references: [id])
+  responsibleDepartmentId Int
+
+  form   ProcessStageForm?
+  stages ProcessStage[]
+}
+
+model ProcessStage {
+  id     Int                @id @default(autoincrement())
+  status ProcessStageStatus @default(PENDING)
+
+  process   Process @relation(fields: [processId], references: [id])
+  processId Int
+
+  responsibleUser   User @relation(fields: [responsibleUserId], references: [id])
+  responsibleUserId Int
+
+  templateStage   ProcessTemplateStage @relation(fields: [templateStageId], references: [id])
+  templateStageId Int
+}
+
+model ProcessStageForm {
+  id Int @id @default(autoincrement())
+
+  fields ProcessStageFormField[]
+
+  processStage   ProcessTemplateStage @relation(fields: [processStageId], references: [id])
+  processStageId Int                  @unique
+}
+
+model ProcessStageFormField {
+  id    Int    @id @default(autoincrement())
+  label String
+  type  String
+
+  form   ProcessStageForm @relation(fields: [formId], references: [id])
+  formId Int
+}
+
+model ProcessActivity {
+  id Int @id @default(autoincrement())
+
+  process   Process @relation(fields: [processId], references: [id])
+  processId Int
+}
+
+model ProcessComment {
+  id          Int     @id @default(autoincrement())
+  description String?
+
+  process   Process @relation(fields: [processId], references: [id])
+  processId Int
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+}
