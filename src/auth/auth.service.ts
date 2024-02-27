@@ -5,6 +5,7 @@ import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { SignInDTO } from './dto/sign-in.dto';
+import { SignUpDTO } from './dto/sign-up.dto';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +15,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signUp(dto: Prisma.UserCreateInput) {
+  async signUp(dto: SignUpDTO) {
     const existedEmail = await this.userService.findByEmail(dto.email);
 
     if (existedEmail) {
@@ -34,15 +35,20 @@ export class AuthService {
       },
     });
 
-    return await this.generateTokens(newUser.id);
+    return await this.generateTokens(newUser);
   }
 
   async signIn(dto: SignInDTO) {
+    if (!dto.email && !dto.username) {
+      throw new HttpException('Email or username is required', 400);
+    }
+
     let user: User | null;
 
     if (dto.email) {
       user = await this.userService.findByEmail(dto.email);
-    } else {
+    }
+    if (dto.username) {
       user = await this.userService.findByUsername(dto.username);
     }
 
@@ -56,12 +62,12 @@ export class AuthService {
       throw new Error('Invalid credentials');
     }
 
-    return await this.generateTokens(user.id);
+    return await this.generateTokens(user);
   }
 
-  async generateTokens(userId: number) {
+  async generateTokens(user: User) {
     const payload = {
-      sub: userId,
+      sub: user.id,
     };
 
     const tokens = {

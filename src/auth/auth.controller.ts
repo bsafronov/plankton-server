@@ -1,8 +1,8 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Public } from './auth.guard';
 import { AuthService } from './auth.service';
 import { SignInDTO } from './dto/sign-in.dto';
-import { Public } from './auth.guard';
+import { SignUpDTO } from './dto/sign-up.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -10,7 +10,7 @@ export class AuthController {
 
   @Public()
   @Post('/sign-up')
-  async signUp(@Body() dto: Prisma.UserCreateInput) {
+  async signUp(@Body() dto: SignUpDTO) {
     return await this.authService.signUp(dto);
   }
 
