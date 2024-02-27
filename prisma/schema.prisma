@@ -48,8 +48,8 @@ model User {
   lastName  String?
   role      Role    @default(USER)
 
-  department   Department @relation(fields: [departmentId], references: [id])
-  departmentId Int
+  department   Department? @relation(fields: [departmentId], references: [id])
+  departmentId Int?
 
   processStages   ProcessStage[]
   processComments ProcessComment[]
