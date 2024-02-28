@@ -1,12 +1,11 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { Prisma, User } from '@prisma/client';
-import { UserService } from 'src/user/user.service';
+import { JwtService } from '@nestjs/jwt';
+import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/prisma.service';
-import { JwtService } from '@nestjs/jwt';
+import { UserService } from 'src/user/user.service';
 import { SignInDTO } from './dto/sign-in.dto';
 import { SignUpDTO } from './dto/sign-up.dto';
-import { RefreshTokenDTO } from './dto/refresh-token.dto';
 
 @Injectable()
 export class AuthService {
@@ -63,7 +62,7 @@ export class AuthService {
     const isValidPassword = await bcrypt.compare(dto.password, user.password);
 
     if (!isValidPassword) {
-      throw new Error('Invalid credentials');
+      throw new HttpException('Invalid credentials', 400);
     }
     const { password, ...rest } = user;
     const tokens = await this.generateTokens(user.id);

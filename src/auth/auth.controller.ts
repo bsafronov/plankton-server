@@ -32,4 +32,11 @@ export class AuthController {
     res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true });
     return user.id;
   }
+
+  @Post('/sign-out')
+  async signOut(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie('access_token');
+    res.clearCookie('refresh_token');
+    return true;
+  }
 }
