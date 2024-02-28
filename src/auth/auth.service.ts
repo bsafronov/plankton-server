@@ -29,14 +29,17 @@ export class AuthService {
       throw new HttpException('User with this username already exists', 400);
     }
     const hashPassword = await bcrypt.hash(dto.password, 10);
-    const newUser = await this.prismaService.user.create({
+    const { password, ...newUser } = await this.prismaService.user.create({
       data: {
         ...dto,
         password: hashPassword,
       },
     });
-
-    return await this.generateTokens(newUser.id);
+    const tokens = await this.generateTokens(newUser.id);
+    return {
+      user: newUser,
+      tokens,
+    };
   }
 
   async signIn(dto: SignInDTO) {
@@ -62,40 +65,47 @@ export class AuthService {
     if (!isValidPassword) {
       throw new Error('Invalid credentials');
     }
+    const { password, ...rest } = user;
+    const tokens = await this.generateTokens(user.id);
 
-    return await this.generateTokens(user.id);
-  }
-
-  async refreshToken(dto: RefreshTokenDTO) {
-    try {
-      const { sub: userId } = await this.jwtService.verifyAsync(
-        dto.refreshToken,
-        {
-          secret: process.env.JWT_REFRESH_SECRET_KEY,
-        },
-      );
-
-      return this.generateTokens(userId);
-    } catch (e) {
-      throw new HttpException('Invalid token', 401);
-    }
+    return {
+      user: rest,
+      tokens,
+    };
   }
 
   async generateTokens(userId: number) {
-    const payload = {
-      sub: userId,
-    };
-
     const tokens = {
-      accessToken: await this.jwtService.signAsync(payload, {
-        expiresIn: '30m',
-      }),
-      refreshToken: await this.jwtService.signAsync(payload, {
-        expiresIn: '7d',
-        secret: process.env.JWT_REFRESH_SECRET_KEY,
-      }),
+      accessToken: await this.jwtService.signAsync(
+        { userId },
+        {
+          expiresIn: '30m',
+        },
+      ),
+      refreshToken: await this.jwtService.signAsync(
+        { userId },
+        {
+          expiresIn: '7d',
+          secret: process.env.JWT_REFRESH_SECRET_KEY,
+        },
+      ),
     };
 
     return tokens;
+  }
+
+  async verifyAccessToken(token: string): Promise<number> {
+    const { userId } = await this.jwtService.verifyAsync(token, {
+      secret: process.env.JWT_ACCESS_SECRET_KEY,
+    });
+    return userId;
+  }
+
+  async verifyRefreshToken(token: string): Promise<number> {
+    const { userId } = await this.jwtService.verifyAsync(token, {
+      secret: process.env.JWT_REFRESH_SECRET_KEY,
+    });
+
+    return userId;
   }
 }

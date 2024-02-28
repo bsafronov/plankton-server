@@ -2,12 +2,12 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
+  SetMetadata,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { Request } from 'express';
-import { SetMetadata } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { Request, Response } from 'express';
+import { AuthService } from './auth.service';
 
 export const IS_PUBLIC_KEY = 'isPublic';
 export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
@@ -15,8 +15,8 @@ export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
-    private jwtService: JwtService,
     private reflector: Reflector,
+    private authService: AuthService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -30,24 +30,44 @@ export class AuthGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(request);
+    const response: Response = context.switchToHttp().getResponse();
 
-    if (!token) {
+    const { access_token, refresh_token } =
+      this.extractTokenFromCookies(request);
+
+    if (!access_token && !refresh_token) {
       throw new UnauthorizedException();
     }
+
     try {
-      const payload = await this.jwtService.verifyAsync(token, {
-        secret: process.env.JWT_ACCESS_SECRET_KEY,
-      });
-      request['user'] = payload;
+      const userId = await this.authService.verifyAccessToken(access_token);
+      request['user'] = userId;
+      return true;
+    } catch {}
+
+    try {
+      const userId = await this.authService.verifyRefreshToken(refresh_token);
+      request['user'] = userId;
+
+      const tokens = await this.authService.generateTokens(userId);
+
+      response.cookie('access_token', tokens.accessToken, { httpOnly: true });
+      response.cookie('refresh_token', tokens.refreshToken, { httpOnly: true });
+      return true;
     } catch {
       throw new UnauthorizedException();
     }
-    return true;
   }
 
-  private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
+  private extractTokenFromCookies(request: Request): {
+    access_token?: string;
+    refresh_token?: string;
+  } {
+    const { access_token, refresh_token } = request.cookies;
+
+    return {
+      access_token,
+      refresh_token,
+    };
   }
 }
