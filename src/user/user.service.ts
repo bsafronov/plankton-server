@@ -1,12 +1,43 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
+import { UserFindManyDTO } from './dto/find-many.dto';
 
 @Injectable()
 export class UserService {
   constructor(private prismaService: PrismaService) {}
 
-  async findMany() {
-    return await this.prismaService.user.findMany();
+  async findMany({
+    page = 1,
+    take = 20,
+    departmentId,
+    username,
+    email,
+    firstName,
+    lastName,
+    role,
+  }: UserFindManyDTO) {
+    return await this.prismaService.user.findMany({
+      take,
+      skip: page * take - take,
+      where: {
+        AND: {
+          departmentId,
+          email: {
+            contains: email,
+          },
+          username: {
+            contains: username,
+          },
+          role: role,
+          firstName: {
+            contains: firstName,
+          },
+          lastName: {
+            contains: lastName,
+          },
+        },
+      },
+    });
   }
 
   async findById(id: number) {

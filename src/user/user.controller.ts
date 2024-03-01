@@ -1,13 +1,16 @@
-import { Controller, Get, Param, Req } from '@nestjs/common';
+import { Controller, Get, Param, Query, Req } from '@nestjs/common';
 import { UserService } from './user.service';
+import { UserFindManyDTO } from './dto/find-many.dto';
 
 @Controller('users')
 export class UserController {
   constructor(private userService: UserService) {}
 
   @Get()
-  findMany() {
-    return this.userService.findMany();
+  async findMany(@Query() dto: UserFindManyDTO) {
+    const users = await this.userService.findMany(dto);
+
+    return users;
   }
 
   @Get('me')
