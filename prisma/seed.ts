@@ -16,7 +16,7 @@ const generateUsers = async (departments: Department[]) => {
     const randomDepartment =
       departments[Math.floor(Math.random() * departments.length)];
 
-    prisma.user.create({
+    await prisma.user.create({
       data: {
         email: faker.internet.email(),
         username: faker.internet.userName(),
