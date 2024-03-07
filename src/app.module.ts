@@ -1,12 +1,15 @@
 import { Module } from '@nestjs/common';
-import { AuthModule } from './auth/auth.module';
-import { UserModule } from './user/user.module';
-import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+import { AuthModule } from './auth/auth.module';
 import { DepartmentModule } from './department/department.module';
+import { PrismaModule } from './prisma/prisma.module';
+import { UserModule } from './user/user.module';
+import { ProcessModule } from './process/process.module';
 
 @Module({
   imports: [
+    PrismaModule,
     AuthModule,
     UserModule,
     JwtModule.register({
@@ -18,6 +21,7 @@ import { DepartmentModule } from './department/department.module';
       isGlobal: true,
     }),
     DepartmentModule,
+    ProcessModule,
   ],
 })
 export class AppModule {}

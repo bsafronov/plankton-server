@@ -1,33 +1,11 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 enum Role {
   USER
   ADMIN
 }
 
-enum ProcessPriority {
-  LOW
-  MEDIUM
-  HIGH
-}
-
-enum ProcessStageStatus {
-  IN_PROGRESS
-  REJECTED
-  COMPLETED
-  PENDING
-}
-
-enum FormFieldType {
+enum FieldType {
   TEXT
-  TEXTAREA
   NUMBER
-  SELECT
-  FILE
 }
 
 generator client {
@@ -50,104 +28,87 @@ model User {
 
   department   Department? @relation(fields: [departmentId], references: [id])
   departmentId Int?
-
-  processStages   ProcessStage[]
-  processComments ProcessComment[]
 }
 
 model Department {
   id    Int    @id @default(autoincrement())
   name  String
   users User[]
-
-  processStages ProcessTemplateStage[]
 }
 
 model Product {
   id   Int    @id @default(autoincrement())
   name String
-
-  processes Process[]
 }
 
-model Process {
-  id       Int             @id @default(autoincrement())
-  priority ProcessPriority
-
-  product   Product @relation(fields: [productId], references: [id])
-  productId Int
-
-  template   ProcessTemplate @relation(fields: [templateId], references: [id])
-  templateId Int
-
-  processStages     ProcessStage[]
-  processActivities ProcessActivity[]
-  processComments   ProcessComment[]
-}
-
+// PROCESS TEMPLATE
 model ProcessTemplate {
-  id        Int       @id @default(autoincrement())
-  stages    Json
-  processes Process[]
+  id Int @id @default(autoincrement())
+
+  fields ProcessFieldTemplate[]
+  stages ProcessStageTemplate[]
 }
 
-model ProcessTemplateStage {
+model ProcessFieldTemplate {
   id   Int    @id @default(autoincrement())
   name String
 
-  responsibleDepartment   Department @relation(fields: [responsibleDepartmentId], references: [id])
-  responsibleDepartmentId Int
+  formFields ProcessStageFormFieldTemplate[]
 
-  form   ProcessStageForm?
-  stages ProcessStage[]
+  template   ProcessTemplate @relation(fields: [templateId], references: [id])
+  templateId Int
 }
 
-model ProcessStage {
-  id     Int                @id @default(autoincrement())
-  status ProcessStageStatus @default(PENDING)
+model ProcessStageTemplate {
+  id   Int    @id @default(autoincrement())
+  name String
 
-  process   Process @relation(fields: [processId], references: [id])
-  processId Int
+  form ProcessStageFormTemplate?
 
-  responsibleUser   User @relation(fields: [responsibleUserId], references: [id])
-  responsibleUserId Int
+  conditions ProcessStageFormConditionTemplate[]
 
-  templateStage   ProcessTemplateStage @relation(fields: [templateStageId], references: [id])
-  templateStageId Int
+  template   ProcessTemplate @relation(fields: [templateId], references: [id])
+  templateId Int
 }
 
-model ProcessStageForm {
+model ProcessStageFormTemplate {
+  id            Int     @id @default(autoincrement())
+  hasConditions Boolean @default(false)
+
+  fields     ProcessStageFormFieldTemplate[]
+  conditions ProcessStageFormConditionTemplate[]
+
+  stage   ProcessStageTemplate? @relation(fields: [stageId], references: [id])
+  stageId Int?                  @unique
+}
+
+model ProcessStageFormConditionTemplate {
   id Int @id @default(autoincrement())
 
-  fields ProcessStageFormField[]
+  stage   ProcessStageTemplate @relation(fields: [stageId], references: [id])
+  stageId Int
 
-  processStage   ProcessTemplateStage @relation(fields: [processStageId], references: [id])
-  processStageId Int                  @unique
-}
+  field   ProcessStageFormFieldTemplate @relation(fields: [fieldId], references: [id])
+  fieldId Int
 
-model ProcessStageFormField {
-  id    Int    @id @default(autoincrement())
-  label String
-  type  String
-
-  form   ProcessStageForm @relation(fields: [formId], references: [id])
+  form   ProcessStageFormTemplate @relation(fields: [formId], references: [id])
   formId Int
 }
 
-model ProcessActivity {
-  id Int @id @default(autoincrement())
-
-  process   Process @relation(fields: [processId], references: [id])
-  processId Int
-}
-
-model ProcessComment {
-  id          Int     @id @default(autoincrement())
+model ProcessStageFormFieldTemplate {
+  id          Int       @id @default(autoincrement())
+  type        FieldType @default(TEXT)
+  label       String?
   description String?
+  placeholder String?
 
-  process   Process @relation(fields: [processId], references: [id])
-  processId Int
+  conditions ProcessStageFormConditionTemplate[]
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  form   ProcessStageFormTemplate @relation(fields: [formId], references: [id])
+  formId Int
+
+  field   ProcessFieldTemplate @relation(fields: [fieldId], references: [id])
+  fieldId Int
 }
+
+// END PROCESS TEMPLATE
