@@ -6,28 +6,20 @@ import { CreateProcessFieldTemplateDTO } from './dto/create-process-field-templa
 import { CreateProcessStageFlowTemplateDTO } from './dto/create-process-stage-flow-template.dto';
 import { CreateProcessStageFieldTemplateDTO } from './dto/create-process-stage-field-template.dto';
 import { CreateProcessStageTemplateDTO } from './dto/create-process-stage-template.dto';
+import { FindManyProcessFieldTemplatesDTO } from './dto/find-many-process-field-templates.dto';
+import { FindManyProcessStageTemplatesDTO } from './dto/find-many-process-stage-templates.dto';
+import { FindManyProcessStageFlowTemplatesDTO } from './dto/find-many-process-stage-flow-templates.dto';
+import { FindManyProcessStageFieldTemplatesDTO } from './dto/find-many-process-stage-field-templates.dto';
 
 @Injectable()
 export class ProcessService {
   constructor(private db: PrismaService) {}
 
+  // CREATE
+
   async createTemplate(dto: CreateProcessTemplateDTO) {
     return this.db.processTemplate.create({
       data: dto,
-    });
-  }
-
-  async findOneTemplate(id: number) {
-    return this.db.processTemplate.findUnique({
-      where: {
-        id,
-      },
-      include: {
-        fields: true,
-        stages: true,
-        stageFlows: true,
-        stageFields: true,
-      },
     });
   }
 
@@ -109,6 +101,58 @@ export class ProcessService {
           },
         },
         value: dto.value,
+      },
+    });
+  }
+
+  // GET
+
+  async findOneTemplate(id: number) {
+    return this.db.processTemplate.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        fields: true,
+        stages: true,
+        stageFlows: true,
+        stageFields: true,
+      },
+    });
+  }
+
+  async findManyFieldTemplates(dto: FindManyProcessFieldTemplatesDTO) {
+    return this.db.processFieldTemplate.findMany({
+      where: {
+        templateId: dto.templateId,
+      },
+    });
+  }
+
+  async findManyStageTemplates(dto: FindManyProcessStageTemplatesDTO) {
+    return this.db.processStageTemplate.findMany({
+      where: {
+        templateId: dto.templateId,
+      },
+    });
+  }
+
+  async findManyStageFlowTemplates(dto: FindManyProcessStageFlowTemplatesDTO) {
+    return this.db.processStageFlowTemplate.findMany({
+      where: {
+        templateId: dto.templateId,
+        stageId: dto.stageId,
+      },
+    });
+  }
+
+  async findManyStageFieldTemplates(
+    dto: FindManyProcessStageFieldTemplatesDTO,
+  ) {
+    return this.db.processStageFieldTemplate.findMany({
+      where: {
+        templateId: dto.templateId,
+        stageId: dto.stageId,
       },
     });
   }
