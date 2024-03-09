@@ -1,11 +1,17 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { ProcessService } from './process.service';
-import { CreateProcessTemplateDTO } from './dto/create-process-template.dto';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+} from '@nestjs/common';
 import { CreateProcessFieldTemplateDTO } from './dto/create-process-field-template.dto';
 import { CreateProcessStageTemplateDTO } from './dto/create-process-stage-template.dto';
-import { CreateProcessStageFormTemplateDTO } from './dto/create-process-stage-form-template.dto';
-import { CreateProcessStageFormFieldTemplateDTO } from './dto/create-process-stage-form-field-template.dto';
-import { CreateProcessStageFormConditionTemplateDTO } from './dto/create-process-stage-form-condition-template.dto';
+import { CreateProcessTemplateDTO } from './dto/create-process-template.dto';
+import { ProcessService } from './process.service';
+import { CreateProcessStageFieldTemplateDTO } from './dto/create-process-stage-field-template.dto';
+import { CreateProcessStageFlowTemplateDTO } from './dto/create-process-stage-flow-template.dto';
 
 @Controller('processes')
 export class ProcessController {
@@ -14,6 +20,11 @@ export class ProcessController {
   @Post('/templates')
   createTemplate(@Body() dto: CreateProcessTemplateDTO) {
     return this.processService.createTemplate(dto);
+  }
+
+  @Get('/templates/:id')
+  findOneTemplate(@Param('id', ParseIntPipe) id: number) {
+    return this.processService.findOneTemplate(id);
   }
 
   @Post('/templates/fields')
@@ -26,22 +37,13 @@ export class ProcessController {
     return this.processService.createStageTemplate(dto);
   }
 
-  @Post('/templates/stages/forms')
-  createStageFormTemplate(@Body() dto: CreateProcessStageFormTemplateDTO) {
-    return this.processService.createStageFormTemplate(dto);
+  @Post('/templates/stages/fields')
+  createStageFieldTemplate(@Body() dto: CreateProcessStageFieldTemplateDTO) {
+    return this.processService.createStageFieldTemplate(dto);
   }
 
-  @Post('/templates/stages/forms/fields')
-  createStageFormFieldTemplate(
-    @Body() dto: CreateProcessStageFormFieldTemplateDTO,
-  ) {
-    return this.processService.createStageFormFieldTemplate(dto);
-  }
-
-  @Post('/templates/stages/forms/conditions')
-  createStageFormConditionTemplate(
-    @Body() dto: CreateProcessStageFormConditionTemplateDTO,
-  ) {
-    return this.processService.createStageFormConditionTemplate(dto);
+  @Post('/templates/stages/flows')
+  createStageFlowTemplate(@Body() dto: CreateProcessStageFlowTemplateDTO) {
+    return this.processService.createStageFlowTemplate(dto);
   }
 }

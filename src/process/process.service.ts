@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateProcessTemplateDTO } from './dto/create-process-template.dto';
-import { CreateProcessStageFormConditionTemplateDTO } from './dto/create-process-stage-form-condition-template.dto';
-import { CreateProcessStageFormFieldTemplateDTO } from './dto/create-process-stage-form-field-template.dto';
-import { CreateProcessStageFormTemplateDTO } from './dto/create-process-stage-form-template.dto';
-import { CreateProcessStageTemplateDTO } from './dto/create-process-stage-template.dto';
+
 import { CreateProcessFieldTemplateDTO } from './dto/create-process-field-template.dto';
+import { CreateProcessStageFlowTemplateDTO } from './dto/create-process-stage-flow-template.dto';
+import { CreateProcessStageFieldTemplateDTO } from './dto/create-process-stage-field-template.dto';
+import { CreateProcessStageTemplateDTO } from './dto/create-process-stage-template.dto';
 
 @Injectable()
 export class ProcessService {
@@ -14,6 +14,20 @@ export class ProcessService {
   async createTemplate(dto: CreateProcessTemplateDTO) {
     return this.db.processTemplate.create({
       data: dto,
+    });
+  }
+
+  async findOneTemplate(id: number) {
+    return this.db.processTemplate.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        fields: true,
+        stages: true,
+        stageFlows: true,
+        stageFields: true,
+      },
     });
   }
 
@@ -43,22 +57,8 @@ export class ProcessService {
     });
   }
 
-  async createStageFormTemplate(dto: CreateProcessStageFormTemplateDTO) {
-    return this.db.processStageFormTemplate.create({
-      data: {
-        stage: {
-          connect: {
-            id: dto.stageId,
-          },
-        },
-      },
-    });
-  }
-
-  async createStageFormFieldTemplate(
-    dto: CreateProcessStageFormFieldTemplateDTO,
-  ) {
-    return this.db.processStageFormFieldTemplate.create({
+  async createStageFieldTemplate(dto: CreateProcessStageFieldTemplateDTO) {
+    return this.db.processStageFieldTemplate.create({
       data: {
         description: dto.description,
         placeholder: dto.placeholder,
@@ -67,9 +67,14 @@ export class ProcessService {
             id: dto.fieldId,
           },
         },
-        form: {
+        stage: {
           connect: {
-            id: dto.formId,
+            id: dto.stageId,
+          },
+        },
+        template: {
+          connect: {
+            id: dto.templateId,
           },
         },
         label: dto.label,
@@ -78,19 +83,19 @@ export class ProcessService {
     });
   }
 
-  async createStageFormConditionTemplate(
-    dto: CreateProcessStageFormConditionTemplateDTO,
-  ) {
-    return this.db.processStageFormConditionTemplate.create({
+  async createStageFlowTemplate(dto: CreateProcessStageFlowTemplateDTO) {
+    return this.db.processStageFlowTemplate.create({
       data: {
-        field: {
+        field: dto.fieldId
+          ? {
+              connect: {
+                id: dto.fieldId,
+              },
+            }
+          : undefined,
+        template: {
           connect: {
-            id: dto.fieldId,
-          },
-        },
-        form: {
-          connect: {
-            id: dto.formId,
+            id: dto.templateId,
           },
         },
         stage: {
@@ -98,6 +103,12 @@ export class ProcessService {
             id: dto.stageId,
           },
         },
+        nextStage: {
+          connect: {
+            id: dto.nextStageId,
+          },
+        },
+        value: dto.value,
       },
     });
   }

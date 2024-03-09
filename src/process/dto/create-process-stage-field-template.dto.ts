@@ -1,11 +1,14 @@
 import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class CreateProcessStageFormFieldTemplateDTO {
+export class CreateProcessStageFieldTemplateDTO {
   @IsNumber()
   fieldId: number;
 
   @IsNumber()
-  formId: number;
+  templateId: number;
+
+  @IsNumber()
+  stageId: number;
 
   @IsOptional()
   @IsString()
@@ -19,6 +22,8 @@ export class CreateProcessStageFormFieldTemplateDTO {
   @IsString()
   description?: string;
 
-  @IsEnum(['TEXT', 'NUMBER'])
+  @IsEnum(['TEXT', 'NUMBER'], {
+    message: 'type must be either "TEXT" or "NUMBER"',
+  })
   type?: 'TEXT' | 'NUMBER';
 }
