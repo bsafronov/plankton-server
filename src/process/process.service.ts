@@ -146,6 +146,17 @@ export class ProcessService {
     });
   }
 
+  async findOneStageTemplate(id: number) {
+    return this.db.processStageTemplate.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        fields: true,
+      },
+    });
+  }
+
   async findManyStageFieldTemplates(
     dto: FindManyProcessStageFieldTemplatesDTO,
   ) {

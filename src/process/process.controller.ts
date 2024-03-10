@@ -73,6 +73,11 @@ export class ProcessController {
     return this.processService.findManyStageFieldTemplates(dto);
   }
 
+  @Get('/templates/stages/:id')
+  findOneStageTemplate(@Param('id', ParseIntPipe) id: number) {
+    return this.processService.findOneStageTemplate(id);
+  }
+
   @Get('/templates/:id')
   findOneTemplate(@Param('id', ParseIntPipe) id: number) {
     return this.processService.findOneTemplate(id);
