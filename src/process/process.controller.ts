@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
 } from '@nestjs/common';
@@ -17,6 +18,7 @@ import { CreateProcessStageFlowTemplateDTO } from './dto/create-process-stage-fl
 import { FindManyProcessFieldTemplatesDTO } from './dto/find-many-process-field-templates.dto';
 import { FindManyProcessStageTemplatesDTO } from './dto/find-many-process-stage-templates.dto';
 import { FindManyProcessStageFlowTemplatesDTO } from './dto/find-many-process-stage-flow-templates.dto';
+import { UpdateProcessTemplateStageDTO } from './dto/update-process-template-stage.dto';
 
 @Controller('processes')
 export class ProcessController {
@@ -89,6 +91,12 @@ export class ProcessController {
     return this.processService.findOneTemplate(id);
   }
 
+  // PATCH
+
+  @Patch('/templates/stages')
+  updateProcessTemplateStage(@Body() dto: UpdateProcessTemplateStageDTO) {
+    return this.processService.updateTemplateStage(dto);
+  }
   // DELETE
 
   @Delete('/templates/:id')

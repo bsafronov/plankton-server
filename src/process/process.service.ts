@@ -10,6 +10,7 @@ import { FindManyProcessFieldTemplatesDTO } from './dto/find-many-process-field-
 import { FindManyProcessStageTemplatesDTO } from './dto/find-many-process-stage-templates.dto';
 import { FindManyProcessStageFlowTemplatesDTO } from './dto/find-many-process-stage-flow-templates.dto';
 import { FindManyProcessStageFieldTemplatesDTO } from './dto/find-many-process-stage-field-templates.dto';
+import { UpdateProcessTemplateStageDTO } from './dto/update-process-template-stage.dto';
 
 @Injectable()
 export class ProcessService {
@@ -168,6 +169,19 @@ export class ProcessService {
       where: {
         templateId: dto.templateId,
         stageId: dto.stageId,
+      },
+    });
+  }
+
+  // PATCH
+
+  async updateTemplateStage({ id, name }: UpdateProcessTemplateStageDTO) {
+    return this.db.processStageTemplate.update({
+      where: {
+        id,
+      },
+      data: {
+        name,
       },
     });
   }
