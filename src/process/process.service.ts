@@ -121,6 +121,10 @@ export class ProcessService {
     });
   }
 
+  async findManyTemplates() {
+    return this.db.processTemplate.findMany();
+  }
+
   async findManyFieldTemplates(dto: FindManyProcessFieldTemplatesDTO) {
     return this.db.processFieldTemplate.findMany({
       where: {
@@ -164,6 +168,16 @@ export class ProcessService {
       where: {
         templateId: dto.templateId,
         stageId: dto.stageId,
+      },
+    });
+  }
+
+  // DELETE
+
+  async deleteTemplate(id: number) {
+    return this.db.processTemplate.delete({
+      where: {
+        id,
       },
     });
   }

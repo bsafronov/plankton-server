@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -49,6 +50,11 @@ export class ProcessController {
 
   // GET
 
+  @Get('/templates')
+  findManyTemplates() {
+    return this.processService.findManyTemplates();
+  }
+
   @Get('/templates/fields')
   findManyFieldTemplates(@Query() dto: FindManyProcessFieldTemplatesDTO) {
     return this.processService.findManyFieldTemplates(dto);
@@ -81,5 +87,12 @@ export class ProcessController {
   @Get('/templates/:id')
   findOneTemplate(@Param('id', ParseIntPipe) id: number) {
     return this.processService.findOneTemplate(id);
+  }
+
+  // DELETE
+
+  @Delete('/templates/:id')
+  deleteTemplate(@Param('id', ParseIntPipe) id: number) {
+    return this.processService.deleteTemplate(id);
   }
 }
