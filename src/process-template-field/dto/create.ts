@@ -1,8 +1,8 @@
 import { IsInt, IsString } from 'class-validator';
 
-export class UpdateProcessTemplateStageDTO {
+export class ProcessTemplateFieldCreateDTO {
   @IsInt()
-  id: number;
+  templateId: number;
 
   @IsString()
   name: string;

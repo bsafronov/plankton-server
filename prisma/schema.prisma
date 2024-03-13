@@ -46,64 +46,64 @@ model ProcessTemplate {
   id   Int    @id @default(autoincrement())
   name String
 
-  fields      ProcessFieldTemplate[]
-  stages      ProcessStageTemplate[]
-  stageFlows  ProcessStageFlowTemplate[]
-  stageFields ProcessStageFieldTemplate[]
+  fields      ProcessTemplateField[]
+  stages      ProcessTemplateStage[]
+  stageFlows  ProcessTemplateStageFlow[]
+  stageFields ProcessTemplateStageField[]
 }
 
-model ProcessFieldTemplate {
+model ProcessTemplateField {
   id   Int    @id @default(autoincrement())
   name String
 
-  formFields ProcessStageFieldTemplate[]
+  formFields ProcessTemplateStageField[]
 
   template   ProcessTemplate @relation(fields: [templateId], references: [id])
   templateId Int
 }
 
-model ProcessStageTemplate {
+model ProcessTemplateStage {
   id   Int    @id @default(autoincrement())
   name String
 
-  fields    ProcessStageFieldTemplate[]
-  flowsFrom ProcessStageFlowTemplate[]  @relation("flowsFrom")
-  flowsTo   ProcessStageFlowTemplate[]  @relation("flowsTo")
+  fields    ProcessTemplateStageField[]
+  flowsFrom ProcessTemplateStageFlow[]  @relation("flowsFrom")
+  flowsTo   ProcessTemplateStageFlow[]  @relation("flowsTo")
 
   template   ProcessTemplate @relation(fields: [templateId], references: [id])
   templateId Int
 }
 
-model ProcessStageFlowTemplate {
+model ProcessTemplateStageFlow {
   id    Int     @id @default(autoincrement())
   value String?
 
-  stage   ProcessStageTemplate @relation("flowsFrom", fields: [stageId], references: [id])
+  stage   ProcessTemplateStage @relation("flowsFrom", fields: [stageId], references: [id])
   stageId Int
 
-  nextStage   ProcessStageTemplate @relation("flowsTo", fields: [nextStageId], references: [id])
+  nextStage   ProcessTemplateStage @relation("flowsTo", fields: [nextStageId], references: [id])
   nextStageId Int
 
-  field   ProcessStageFieldTemplate? @relation(fields: [fieldId], references: [id])
+  field   ProcessTemplateStageField? @relation(fields: [fieldId], references: [id])
   fieldId Int?
 
   template   ProcessTemplate @relation(fields: [templateId], references: [id])
   templateId Int
 }
 
-model ProcessStageFieldTemplate {
+model ProcessTemplateStageField {
   id          Int       @id @default(autoincrement())
   type        FieldType @default(TEXT)
   label       String?
   description String?
   placeholder String?
 
-  flows ProcessStageFlowTemplate[]
+  flows ProcessTemplateStageFlow[]
 
-  stage   ProcessStageTemplate @relation(fields: [stageId], references: [id])
+  stage   ProcessTemplateStage @relation(fields: [stageId], references: [id])
   stageId Int
 
-  field   ProcessFieldTemplate @relation(fields: [fieldId], references: [id])
+  field   ProcessTemplateField @relation(fields: [fieldId], references: [id])
   fieldId Int
 
   template   ProcessTemplate @relation(fields: [templateId], references: [id])

@@ -6,6 +6,11 @@ import { DepartmentModule } from './department/department.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { UserModule } from './user/user.module';
 import { ProcessModule } from './process/process.module';
+import { ProcessTemplateModule } from './process-template/process-template.module';
+import { ProcessTemplateFieldModule } from './process-template-field/process-template-field.module';
+import { ProcessTemplateStageModule } from './process-template-stage/process-template-stage.module';
+import { ProcessTemplateStageFieldModule } from './process-template-stage-field/process-template-stage-field.module';
+import { ProcessTemplateStageFlowModule } from './process-template-stage-flow/process-template-stage-flow.module';
 
 @Module({
   imports: [
@@ -22,6 +27,11 @@ import { ProcessModule } from './process/process.module';
     }),
     DepartmentModule,
     ProcessModule,
+    ProcessTemplateModule,
+    ProcessTemplateFieldModule,
+    ProcessTemplateStageModule,
+    ProcessTemplateStageFieldModule,
+    ProcessTemplateStageFlowModule,
   ],
 })
 export class AppModule {}

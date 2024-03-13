@@ -1,6 +1,6 @@
 import { IsString } from 'class-validator';
 
-export class CreateProcessTemplateDTO {
+export class ProcessTemplateCreateDTO {
   @IsString()
   name: string;
 }

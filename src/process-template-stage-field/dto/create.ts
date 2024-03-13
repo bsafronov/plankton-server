@@ -1,6 +1,6 @@
 import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class CreateProcessStageFieldTemplateDTO {
+export class ProcessTemplateStageFieldCreateDTO {
   @IsNumber()
   fieldId: number;
 

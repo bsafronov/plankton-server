@@ -1,8 +1,8 @@
 import { IsNumber, IsString } from 'class-validator';
 
-export class CreateProcessFieldTemplateDTO {
+export class ProcessTemplateStageUpdateDTO {
   @IsNumber()
-  templateId: number;
+  id: number;
 
   @IsString()
   name: string;
