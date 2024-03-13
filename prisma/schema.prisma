@@ -58,7 +58,7 @@ model ProcessTemplateField {
 
   formFields ProcessTemplateStageField[]
 
-  template   ProcessTemplate @relation(fields: [templateId], references: [id])
+  template   ProcessTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
   templateId Int
 }
 
@@ -70,7 +70,7 @@ model ProcessTemplateStage {
   flowsFrom ProcessTemplateStageFlow[]  @relation("flowsFrom")
   flowsTo   ProcessTemplateStageFlow[]  @relation("flowsTo")
 
-  template   ProcessTemplate @relation(fields: [templateId], references: [id])
+  template   ProcessTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
   templateId Int
 }
 
@@ -78,16 +78,16 @@ model ProcessTemplateStageFlow {
   id    Int     @id @default(autoincrement())
   value String?
 
-  stage   ProcessTemplateStage @relation("flowsFrom", fields: [stageId], references: [id])
+  stage   ProcessTemplateStage @relation("flowsFrom", fields: [stageId], references: [id], onDelete: Cascade)
   stageId Int
 
-  nextStage   ProcessTemplateStage @relation("flowsTo", fields: [nextStageId], references: [id])
+  nextStage   ProcessTemplateStage @relation("flowsTo", fields: [nextStageId], references: [id], onDelete: Cascade)
   nextStageId Int
 
-  field   ProcessTemplateStageField? @relation(fields: [fieldId], references: [id])
+  field   ProcessTemplateStageField? @relation(fields: [fieldId], references: [id], onDelete: Cascade)
   fieldId Int?
 
-  template   ProcessTemplate @relation(fields: [templateId], references: [id])
+  template   ProcessTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
   templateId Int
 }
 
@@ -100,13 +100,13 @@ model ProcessTemplateStageField {
 
   flows ProcessTemplateStageFlow[]
 
-  stage   ProcessTemplateStage @relation(fields: [stageId], references: [id])
+  stage   ProcessTemplateStage @relation(fields: [stageId], references: [id], onDelete: Cascade)
   stageId Int
 
-  field   ProcessTemplateField @relation(fields: [fieldId], references: [id])
+  field   ProcessTemplateField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
   fieldId Int
 
-  template   ProcessTemplate @relation(fields: [templateId], references: [id])
+  template   ProcessTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
   templateId Int
 }
 
